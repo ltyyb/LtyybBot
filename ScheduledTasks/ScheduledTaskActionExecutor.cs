@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Newtonsoft.Json.Linq;
 using Sisters.WudiLib;
 
 namespace LtyybBot;
@@ -102,10 +102,10 @@ internal sealed class ScheduledTaskActionExecutor
         cancellationToken.ThrowIfCancellationRequested();
 
         var payload = action.ApiParams.HasValue
-            ? JsonSerializer.Deserialize<object>(action.ApiParams.Value.GetRawText(), ScheduledTaskJson.SerializerOptions)
-            : new { };
+            ? JToken.Parse(action.ApiParams.Value.GetRawText())
+            : new JObject();
 
-        var success = await api.CallAsync(action.ApiAction, payload ?? new { });
+        var success = await api.CallAsync(action.ApiAction, payload);
         if (!success)
         {
             _logger.LogWarning("任务 {TaskId} 的通用 API 调用返回 false。Action={ApiAction}", task.Id, action.ApiAction);
