@@ -1,0 +1,45 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+publish/
+artifacts/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userprefs
+
+# IDE folders
+.vs/
+.vscode/
+.idea/
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+
+# Local app settings and secrets
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# Scheduled task runtime state
+data/scheduled-tasks/*.task.json.state.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini

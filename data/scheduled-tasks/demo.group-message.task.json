@@ -1,0 +1,17 @@
+{
+  "id": "daily-group-greeting",
+  "description": "示例：每天固定时间向群发送消息",
+  "enabled": false,
+  "timeZone": "Asia/Shanghai",
+  "schedule": {
+    "type": "daily",
+    "dailyTimes": [ "09:00", "18:00" ]
+  },
+  "actions": [
+    {
+      "type": "send_group_message",
+      "groupId": 123456789,
+      "message": "这是一条来自磁盘定时任务的测试消息。"
+    }
+  ]
+}
