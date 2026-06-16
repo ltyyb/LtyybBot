@@ -43,3 +43,6 @@ data/scheduled-tasks/*.task.json.state.json
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Environment variables file
+.env

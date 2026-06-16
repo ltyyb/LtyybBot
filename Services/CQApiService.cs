@@ -25,7 +25,7 @@ internal class CQApiService : BackgroundService, ICQApiService
         _logger.LogInformation($"""
         ⚙️| 当前连接配置:
             WsServerPort: {_options.WsServerPort}
-            WsServerToken: (hidden)
+            WsServerToken: {(string.IsNullOrWhiteSpace(_options.WsServerToken) ? "（未设置）" : "（已设置）")}
         ==================================
         """);
         if (_options.WsServerPort <= 0 || _options.WsServerPort > 65535)
