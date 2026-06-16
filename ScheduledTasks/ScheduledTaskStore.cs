@@ -56,9 +56,15 @@ internal sealed class ScheduledTaskStore
     {
         var stateFilePath = GetStateFilePath(taskFilePath);
         Directory.CreateDirectory(Path.GetDirectoryName(stateFilePath)!);
+        var tempFilePath = $"{stateFilePath}.tmp";
 
-        await using var stream = File.Create(stateFilePath);
-        await JsonSerializer.SerializeAsync(stream, state, ScheduledTaskJson.SerializerOptions, cancellationToken);
+        await using (var stream = File.Create(tempFilePath))
+        {
+            await JsonSerializer.SerializeAsync(stream, state, ScheduledTaskJson.SerializerOptions, cancellationToken);
+            await stream.FlushAsync(cancellationToken);
+        }
+
+        File.Move(tempFilePath, stateFilePath, overwrite: true);
     }
 
     private async Task<ScheduledTaskState> LoadStateAsync(string taskFilePath, CancellationToken cancellationToken)
@@ -69,12 +75,27 @@ internal sealed class ScheduledTaskStore
             return new ScheduledTaskState();
         }
 
-        await using var stream = File.OpenRead(stateFilePath);
-        return await JsonSerializer.DeserializeAsync<ScheduledTaskState>(
-                   stream,
-                   ScheduledTaskJson.SerializerOptions,
-                   cancellationToken)
-               ?? new ScheduledTaskState();
+        var fileInfo = new FileInfo(stateFilePath);
+        if (fileInfo.Length == 0)
+        {
+            _logger.LogWarning("任务状态文件为空，已按无状态处理: {StateFilePath}", stateFilePath);
+            return new ScheduledTaskState();
+        }
+
+        try
+        {
+            await using var stream = File.OpenRead(stateFilePath);
+            return await JsonSerializer.DeserializeAsync<ScheduledTaskState>(
+                       stream,
+                       ScheduledTaskJson.SerializerOptions,
+                       cancellationToken)
+                   ?? new ScheduledTaskState();
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "任务状态文件不是有效 JSON，已按无状态处理: {StateFilePath}", stateFilePath);
+            return new ScheduledTaskState();
+        }
     }
 
     private static string GetStateFilePath(string taskFilePath)
